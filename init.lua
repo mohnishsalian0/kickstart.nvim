@@ -1107,21 +1107,10 @@ require('lazy').setup({
       'jackMort/ChatGPT.nvim',
       event = 'VeryLazy',
       config = function()
-        -- Function to read the contents of a file
-        local function read_file(filename)
-          local file = io.open(filename, 'r')
-          if not file then
-            return nil
-          end
-          local content = file:read '*all'
-          file:close()
-          return content
-        end
-
         -- Read the API key from the .env file
-        local env_content = read_file(os.getenv 'HOME' .. '/.config/nvim/.env')
+        local env_path = os.getenv 'HOME' .. '/.config/nvim/.env'
         require('chatgpt').setup {
-          api_key_cmd = 'echo ' .. env_content,
+          api_key_cmd = 'cat ' .. env_path,
         }
       end,
       dependencies = {
