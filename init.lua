@@ -790,29 +790,26 @@ require('lazy').setup({
         mocha = function(mocha)
           return {
             Search = { fg = mocha.mantle, bg = mocha.yellow },
+            IncSearch = { fg = mocha.mantle, bg = '#ffb38a' },
             Operator = { fg = mocha.text },
           }
         end,
       },
       custom_highlights = function(colors)
         return {
-          Cmp = { bg = colors.flamingo, fg = colors.flamingo },
           FloatBorder = { bg = colors.mantle, fg = colors.mantle },
           Normal = { bg = colors.mantle },
           NormalFloat = { bg = colors.surface0 },
-          TelescopePromptTitle = { fg = colors.mantle, bg = colors.mantle },
-          TelescopePreviewTitle = { fg = colors.mantle, bg = colors.mantle },
-          TelescopeResultsTitle = { fg = colors.mantle, bg = colors.mantle },
-          -- TelescopeSelection = { bg = colors.surface0 },
+          TelescopeBorder = { fg = colors.mantle, bg = colors.mantle },
+          WinSeparator = { fg = colors.mantle, bg = colors.mantle },
         }
       end,
       color_overrides = {
         mocha = {
-          base = '#1F1F1F',
-          mantle = '#171717',
-          surface0 = '#262626',
+          base = '#171717',
+          mantle = '#262626',
+          surface0 = '#404040',
           surface1 = '#525252',
-          sky = '#FFB38A',
         },
         integrations = {},
       },
