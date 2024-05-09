@@ -374,7 +374,7 @@ require('lazy').setup({
         -- },
         -- pickers = {}
         defaults = {
-          file_ignore_patterns = { '^target/' },
+          file_ignore_patterns = { '^target/', '^node_modules/' },
         },
         extensions = {
           ['ui-select'] = {
@@ -586,7 +586,10 @@ require('lazy').setup({
         --    https://github.com/pmizio/typescript-tools.nvim
         --
         -- But for many setups, the LSP (`tsserver`) will work just fine
-        -- tsserver = {},
+        tsserver = {},
+        tailwindcss = {
+          filetypes = { 'html', 'css', 'javascript', 'typescript', 'typescriptreact', 'rust' },
+        },
         --
 
         lua_ls = {
@@ -792,18 +795,20 @@ require('lazy').setup({
             Search = { fg = mocha.mantle, bg = mocha.yellow },
             IncSearch = { fg = mocha.mantle, bg = '#ffb38a' },
             Operator = { fg = mocha.text },
+            FloatBorder = { bg = mocha.mantle, fg = mocha.mantle },
+            Normal = { bg = mocha.mantle },
+            NormalFloat = { bg = mocha.surface0 },
+            TelescopeBorder = { fg = mocha.mantle, bg = mocha.mantle },
+            TodoFgTODO = { fg = mocha.teal },
+            TodoBgTODO = { fg = mocha.mantle, bg = mocha.teal },
+            TodoFgHACK = { fg = mocha.yellow },
+            TodoBgHACK = { fg = mocha.mantle, bg = mocha.yellow },
+            TodoFgFIX = { fg = mocha.red },
+            TodoBgFIX = { fg = mocha.mantle, bg = mocha.red },
+            WinSeparator = { fg = mocha.mantle, bg = mocha.mantle },
           }
         end,
       },
-      custom_highlights = function(colors)
-        return {
-          FloatBorder = { bg = colors.mantle, fg = colors.mantle },
-          Normal = { bg = colors.mantle },
-          NormalFloat = { bg = colors.surface0 },
-          TelescopeBorder = { fg = colors.mantle, bg = colors.mantle },
-          WinSeparator = { fg = colors.mantle, bg = colors.mantle },
-        }
-      end,
       color_overrides = {
         mocha = {
           base = '#171717',
@@ -868,56 +873,11 @@ require('lazy').setup({
       --  Check out: https://github.com/echasnovski/mini.nvim
     end,
   },
-  -- {
-  --   'nvim-lualine/lualine.nvim',
-  --   -- dependencies = { 'nvim-tree/nvim-web-devicons' },
-  --   opts = {
-  --     options = {
-  --       -- theme = 'catppuccin',
-  --       icons_enabled = true,
-  --       component_separators = { left = '', right = '' },
-  --       section_separators = { left = '', right = '' },
-  --       disabled_filetypes = {
-  --         statusline = {},
-  --         winbar = {},
-  --       },
-  --       ignore_focus = {},
-  --       always_divide_middle = true,
-  --       globalstatus = false,
-  --       refresh = {
-  --         statusline = 1000,
-  --         tabline = 1000,
-  --         winbar = 1000,
-  --       },
-  --     },
-  --     sections = {
-  --       lualine_a = { 'mode' },
-  --       lualine_b = { 'branch', 'diff', 'diagnostics' },
-  --       -- lualine_c = { 'filename' },
-  --       -- lualine_x = { 'encoding', 'fileformat', 'filetype' },
-  --       lualine_x = { { 'filename', path = 1 }, 'filetype' },
-  --       lualine_y = { 'progress' },
-  --       lualine_z = { 'location' },
-  --     },
-  --     inactive_sections = {
-  --       lualine_a = {},
-  --       lualine_b = {},
-  --       lualine_c = { 'filename' },
-  --       lualine_x = { 'location' },
-  --       lualine_y = {},
-  --       lualine_z = {},
-  --     },
-  --     tabline = {},
-  --     winbar = {},
-  --     inactive_winbar = {},
-  --     extensions = {},
-  --   },
-  -- },
   { -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
     build = ':TSUpdate',
     opts = {
-      ensure_installed = { 'bash', 'c', 'html', 'lua', 'markdown', 'vim', 'vimdoc', 'rust' },
+      ensure_installed = { 'bash', 'c', 'html', 'lua', 'markdown', 'vim', 'vimdoc', 'rust', 'typescript' },
       -- Autoinstall languages that are not installed
       auto_install = true,
       highlight = {
@@ -1076,6 +1036,10 @@ require('lazy').setup({
                   ['async-trait'] = { 'async_trait' },
                   ['napi-derive'] = { 'napi' },
                   ['async-recursion'] = { 'async_recursion' },
+                  leptos_macro = {
+                    -- "component",
+                    'server',
+                  },
                 },
               },
             },
