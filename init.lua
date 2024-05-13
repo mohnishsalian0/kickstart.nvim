@@ -885,7 +885,7 @@ require('lazy').setup({
         -- Some languages depend on vim's regex highlighting system (such as Ruby) for indent rules.
         --  If you are experiencing weird indenting issues, add the language to
         --  the list of additional_vim_regex_highlighting and disabled languages for indent.
-        additional_vim_regex_highlighting = { 'ruby' },
+        additional_vim_regex_highlighting = { 'ruby', 'rust' },
       },
       indent = { enable = true, disable = { 'ruby' } },
       textobjects = {
@@ -939,6 +939,15 @@ require('lazy').setup({
           node_incremental = '<CR>',
           scope_incremental = '<TAB>',
           node_decremental = '<BS>',
+        },
+      },
+      swap = {
+        enable = true,
+        swap_next = {
+          ['<leader>a'] = '@parameter.inner',
+        },
+        swap_previous = {
+          ['<leader>A'] = '@parameter.inner',
         },
       },
     },
@@ -1036,10 +1045,10 @@ require('lazy').setup({
                   ['async-trait'] = { 'async_trait' },
                   ['napi-derive'] = { 'napi' },
                   ['async-recursion'] = { 'async_recursion' },
-                  leptos_macro = {
-                    -- "component",
-                    'server',
-                  },
+                  -- leptos_macro = {
+                  --   'component',
+                  --   'server',
+                  -- },
                 },
               },
             },
@@ -1085,6 +1094,13 @@ require('lazy').setup({
     -- Treesitter treeobjects
     {
       'nvim-treesitter/nvim-treesitter-textobjects',
+    },
+
+    -- Autoclose brackets, quotes, etc
+    {
+      'windwp/nvim-autopairs',
+      event = 'InsertEnter',
+      config = true,
     },
   },
 }, {
