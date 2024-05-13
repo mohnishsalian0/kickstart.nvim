@@ -90,8 +90,8 @@ P.S. You can delete this when you're done too. It's your config now! :)
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
--- Set to true if you have a Nerd Font installed and selected in the terminal
-vim.g.have_nerd_font = false
+-- Set to true if you have a Nerd Font installed
+vim.g.have_nerd_font = true
 
 -- [[ Setting options ]]
 -- See `:help vim.opt`
@@ -99,10 +99,10 @@ vim.g.have_nerd_font = false
 --  For more options, you can see `:help option-list`
 
 -- Make line numbers default
-vim.opt.number = true
+-- vim.opt.number = true
 -- You can also add relative line numbers, to help with jumping.
 --  Experiment for yourself to see if you like it!
--- vim.opt.relativenumber = true
+vim.opt.relativenumber = true
 
 -- Enable mouse mode, can be useful for resizing splits for example!
 vim.opt.mouse = 'a'
@@ -113,7 +113,7 @@ vim.opt.showmode = false
 -- Sync clipboard between OS and Neovim.
 --  Remove this option if you want your OS clipboard to remain independent.
 --  See `:help 'clipboard'`
-vim.opt.clipboard = 'unnamedplus'
+-- vim.opt.clipboard = 'unnamedplus'
 
 -- Enable break indent
 vim.opt.breakindent = true
@@ -187,8 +187,12 @@ vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' }
 --  See `:help wincmd` for a list of all window commands
 vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
 vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
-vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
-vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
+-- vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
+vim.keymap.set('n', '<C-j>', '10j', { desc = 'Move 10 lines down' })
+vim.keymap.set('v', '<C-j>', '10j', { desc = 'Move 10 lines down in visual mode' })
+-- vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
+vim.keymap.set('n', '<C-k>', '10k', { desc = 'Move 10 lines up' })
+vim.keymap.set('v', '<C-k>', '10k', { desc = 'Move 10 lines up in visual mode' })
 
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
@@ -288,6 +292,22 @@ require('lazy').setup({
         ['<leader>w'] = { name = '[W]orkspace', _ = 'which_key_ignore' },
         ['<leader>t'] = { name = '[T]oggle', _ = 'which_key_ignore' },
         ['<leader>h'] = { name = 'Git [H]unk', _ = 'which_key_ignore' },
+        m = {
+          name = 'ChatGPT',
+          c = { '<cmd>ChatGPT<CR>', 'ChatGPT' },
+          e = { '<cmd>ChatGPTEditWithInstruction<CR>', 'Edit with instruction', mode = { 'n', 'v' } },
+          g = { '<cmd>ChatGPTRun grammar_correction<CR>', 'Grammar Correction', mode = { 'n', 'v' } },
+          t = { '<cmd>ChatGPTRun translate<CR>', 'Translate', mode = { 'n', 'v' } },
+          k = { '<cmd>ChatGPTRun keywords<CR>', 'Keywords', mode = { 'n', 'v' } },
+          d = { '<cmd>ChatGPTRun docstring<CR>', 'Docstring', mode = { 'n', 'v' } },
+          a = { '<cmd>ChatGPTRun add_tests<CR>', 'Add Tests', mode = { 'n', 'v' } },
+          o = { '<cmd>ChatGPTRun optimize_code<CR>', 'Optimize Code', mode = { 'n', 'v' } },
+          s = { '<cmd>ChatGPTRun summarize<CR>', 'Summarize', mode = { 'n', 'v' } },
+          f = { '<cmd>ChatGPTRun fix_bugs<CR>', 'Fix Bugs', mode = { 'n', 'v' } },
+          x = { '<cmd>ChatGPTRun explain_code<CR>', 'Explain Code', mode = { 'n', 'v' } },
+          r = { '<cmd>ChatGPTRun roxygen_edit<CR>', 'Roxygen Edit', mode = { 'n', 'v' } },
+          l = { '<cmd>ChatGPTRun code_readability_analysis<CR>', 'Code Readability Analysis', mode = { 'n', 'v' } },
+        },
       }
       -- visual mode
       require('which-key').register({
@@ -359,6 +379,9 @@ require('lazy').setup({
         --   },
         -- },
         -- pickers = {}
+        defaults = {
+          file_ignore_patterns = { '^target/', '^node_modules/' },
+        },
         extensions = {
           ['ui-select'] = {
             require('telescope.themes').get_dropdown(),
@@ -568,14 +591,32 @@ require('lazy').setup({
         -- clangd = {},
         -- gopls = {},
         -- pyright = {},
-        -- rust_analyzer = {},
+        rust_analyzer = {},
+        taplo = {
+          keys = {
+            {
+              'K',
+              function()
+                if vim.fn.expand '%:t' == 'Cargo.toml' and require('crates').popup_available() then
+                  require('crates').show_popup()
+                else
+                  vim.lsp.buf.hover()
+                end
+              end,
+              desc = 'Show Crate Documentation',
+            },
+          },
+        },
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
         -- Some languages (like typescript) have entire language plugins that can be useful:
         --    https://github.com/pmizio/typescript-tools.nvim
         --
         -- But for many setups, the LSP (`tsserver`) will work just fine
-        -- tsserver = {},
+        tsserver = {},
+        tailwindcss = {
+          filetypes = { 'html', 'css', 'javascript', 'typescript', 'typescriptreact', 'rust' },
+        },
         --
 
         lua_ls = {
@@ -620,6 +661,7 @@ require('lazy').setup({
             server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
             require('lspconfig')[server_name].setup(server)
           end,
+          ['rust_analyzer'] = function() end,
         },
       }
     end,
@@ -697,6 +739,15 @@ require('lazy').setup({
       --  into multiple repos for maintenance purposes.
       'hrsh7th/cmp-nvim-lsp',
       'hrsh7th/cmp-path',
+      {
+        'Saecki/crates.nvim',
+        event = { 'BufRead Cargo.toml' },
+        opts = {
+          src = {
+            cmp = { enabled = true },
+          },
+        },
+      },
     },
     config = function()
       -- See `:help cmp`
@@ -778,13 +829,47 @@ require('lazy').setup({
     -- change the command in the config to whatever the name of that colorscheme is.
     --
     -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
-    'folke/tokyonight.nvim',
+    -- 'folke/tokyonight.nvim',
+    'catppuccin/nvim',
+    name = 'catppuccin',
+    opts = {
+      highlight_overrides = {
+        mocha = function(mocha)
+          return {
+            Search = { fg = mocha.mantle, bg = mocha.yellow },
+            IncSearch = { fg = mocha.mantle, bg = '#ffb38a' },
+            Operator = { fg = mocha.text },
+            FloatBorder = { bg = mocha.mantle, fg = mocha.mantle },
+            Normal = { bg = mocha.mantle },
+            NormalFloat = { bg = mocha.surface0 },
+            TelescopeBorder = { fg = mocha.mantle, bg = mocha.mantle },
+            TodoFgTODO = { fg = mocha.teal },
+            TodoBgTODO = { fg = mocha.mantle, bg = mocha.teal },
+            TodoFgHACK = { fg = mocha.yellow },
+            TodoBgHACK = { fg = mocha.mantle, bg = mocha.yellow },
+            TodoFgFIX = { fg = mocha.red },
+            TodoBgFIX = { fg = mocha.mantle, bg = mocha.red },
+            WinSeparator = { fg = mocha.mantle, bg = mocha.mantle },
+          }
+        end,
+      },
+      color_overrides = {
+        mocha = {
+          base = '#171717',
+          mantle = '#262626',
+          surface0 = '#404040',
+          surface1 = '#525252',
+        },
+        integrations = {},
+      },
+    },
     priority = 1000, -- Make sure to load this before all the other start plugins.
     init = function()
       -- Load the colorscheme here.
       -- Like many other themes, this one has different styles, and you could load
       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      vim.cmd.colorscheme 'tokyonight-night'
+      -- vim.cmd.colorscheme 'tokyonight-night'
+      vim.cmd.colorscheme 'catppuccin'
 
       -- You can configure highlights by doing something like:
       vim.cmd.hi 'Comment gui=none'
@@ -816,6 +901,7 @@ require('lazy').setup({
       --  You could remove this setup call if you don't like it,
       --  and try some other statusline plugin
       local statusline = require 'mini.statusline'
+
       -- set use_icons to true if you have a Nerd Font
       statusline.setup { use_icons = vim.g.have_nerd_font }
 
@@ -835,7 +921,7 @@ require('lazy').setup({
     'nvim-treesitter/nvim-treesitter',
     build = ':TSUpdate',
     opts = {
-      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'vim', 'vimdoc' },
+      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'rust', 'typescript', 'vim', 'vimdoc' },
       -- Autoinstall languages that are not installed
       auto_install = true,
       highlight = {
@@ -843,9 +929,71 @@ require('lazy').setup({
         -- Some languages depend on vim's regex highlighting system (such as Ruby) for indent rules.
         --  If you are experiencing weird indenting issues, add the language to
         --  the list of additional_vim_regex_highlighting and disabled languages for indent.
-        additional_vim_regex_highlighting = { 'ruby' },
+        additional_vim_regex_highlighting = { 'ruby', 'rust' },
       },
       indent = { enable = true, disable = { 'ruby' } },
+      textobjects = {
+        select = {
+          enable = true,
+
+          -- Automatically jump forward to textobj, similar to targets.vim
+          lookahead = true,
+
+          keymaps = {
+            -- You can use the capture groups defined in textobjects.scm
+            ['al'] = '@assignment.lhs',
+            ['ar'] = '@assignment.rhs',
+            ['af'] = '@function.outer',
+            ['if'] = '@function.inner',
+            ['ac'] = '@class.outer',
+            -- You can optionally set descriptions to the mappings (used in the desc parameter of
+            -- nvim_buf_set_keymap) which plugins like which-key display
+            ['ic'] = { query = '@class.inner', desc = 'Select inner part of a class region' },
+            -- You can also use captures from other query groups like `locals.scm`
+            ['as'] = { query = '@scope', query_group = 'locals', desc = 'Select language scope' },
+          },
+          -- You can choose the select mode (default is charwise 'v')
+          --
+          -- Can also be a function which gets passed a table with the keys
+          -- * query_string: eg '@function.inner'
+          -- * method: eg 'v' or 'o'
+          -- and should return the mode ('v', 'V', or '<c-v>') or a table
+          -- mapping query_strings to modes.
+          selection_modes = {
+            ['@parameter.outer'] = 'v', -- charwise
+            ['@function.outer'] = 'V', -- linewise
+            ['@class.outer'] = '<c-v>', -- blockwise
+          },
+          -- If you set this to `true` (default is `false`) then any textobject is
+          -- extended to include preceding or succeeding whitespace. Succeeding
+          -- whitespace has priority in order to act similarly to eg the built-in
+          -- `ap`.
+          --
+          -- Can also be a function which gets passed a table with the keys
+          -- * query_string: eg '@function.inner'
+          -- * selection_mode: eg 'v'
+          -- and should return true or false
+          include_surrounding_whitespace = true,
+        },
+      },
+      incremental_selection = {
+        enable = true,
+        keymaps = {
+          init_selection = '<CR>',
+          node_incremental = '<CR>',
+          scope_incremental = '<TAB>',
+          node_decremental = '<BS>',
+        },
+      },
+      swap = {
+        enable = true,
+        swap_next = {
+          ['<leader>a'] = '@parameter.inner',
+        },
+        swap_previous = {
+          ['<leader>A'] = '@parameter.inner',
+        },
+      },
     },
     config = function(_, opts)
       -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
@@ -885,7 +1033,125 @@ require('lazy').setup({
   --
   --  Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
   --    For additional information, see `:help lazy.nvim-lazy.nvim-structuring-your-plugins`
-  -- { import = 'custom.plugins' },
+  { import = 'custom.plugins' },
+  {
+
+    -- Rust tools (archived)
+    { 'simrat39/rust-tools.nvim', enabled = false },
+
+    -- Rust debugger
+    {
+      'williamboman/mason.nvim',
+      optional = true,
+      opts = function(_, opts)
+        opts.ensure_installed = opts.ensure_installed or {}
+        vim.list_extend(opts.ensure_installed, { 'codelldb' })
+      end,
+    },
+
+    -- Rustacean nvim
+    {
+      'mrcjkb/rustaceanvim',
+      version = '^4', -- Recommended
+      ft = { 'rust' },
+      opts = {
+        server = {
+          on_attach = function(client, bufnr)
+            -- register which-key mappings
+            local wk = require 'which-key'
+            wk.register({
+              ['<leader>cR'] = {
+                function()
+                  vim.cmd.RustLsp 'codeAction'
+                end,
+                'Code Action',
+              },
+              ['<leader>dr'] = {
+                function()
+                  vim.cmd.RustLsp 'debuggables'
+                end,
+                'Rust debuggables',
+              },
+            }, { mode = 'n', buffer = bufnr })
+          end,
+          default_settings = {
+            -- rust-analyzer language server configuration
+            ['rust-analyzer'] = {
+              cargo = {
+                allFeatures = true,
+                loadOutDirsFromCheck = true,
+                runBuildScripts = true,
+              },
+              -- Add clippy lints for Rust.
+              checkOnSave = {
+                allFeatures = true,
+                command = 'clippy',
+                extraArgs = { '--no-deps' },
+              },
+              procMacro = {
+                enable = true,
+                ignored = {
+                  ['async-trait'] = { 'async_trait' },
+                  ['napi-derive'] = { 'napi' },
+                  ['async-recursion'] = { 'async_recursion' },
+                  -- leptos_macro = {
+                  --   'component',
+                  --   'server',
+                  -- },
+                },
+              },
+            },
+          },
+        },
+      },
+      config = function(_, opts)
+        vim.g.rustaceanvim = vim.tbl_deep_extend('force', {}, opts or {})
+      end,
+    },
+
+    -- Rust test
+    {
+      'nvim-neotest/neotest',
+      optional = true,
+      opts = function(_, opts)
+        opts.adapters = opts.adapters or {}
+        vim.list_extend(opts.adapters, {
+          require 'rustaceanvim.neotest',
+        })
+      end,
+    },
+
+    -- ChatGPT
+    {
+      'jackMort/ChatGPT.nvim',
+      event = 'VeryLazy',
+      config = function()
+        -- Read the API key from the .env file
+        local env_path = os.getenv 'HOME' .. '/.config/nvim/.env'
+        require('chatgpt').setup {
+          api_key_cmd = 'cat ' .. env_path,
+        }
+      end,
+      dependencies = {
+        'MunifTanjim/nui.nvim',
+        'nvim-lua/plenary.nvim',
+        'folke/trouble.nvim',
+        'nvim-telescope/telescope.nvim',
+      },
+    },
+
+    -- Treesitter treeobjects
+    {
+      'nvim-treesitter/nvim-treesitter-textobjects',
+    },
+
+    -- Autoclose brackets, quotes, etc
+    {
+      'windwp/nvim-autopairs',
+      event = 'InsertEnter',
+      config = true,
+    },
+  },
 }, {
   ui = {
     -- If you are using a Nerd Font: set icons to an empty table which will use the
