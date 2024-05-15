@@ -154,6 +154,9 @@ vim.opt.cursorline = true
 -- Minimal number of screen lines to keep above and below the cursor.
 vim.opt.scrolloff = 10
 
+-- Hide bufferline on top
+vim.opt.showtabline = 0
+
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
 
@@ -855,10 +858,10 @@ require('lazy').setup({
       },
       color_overrides = {
         mocha = {
-          base = '#171717',
-          mantle = '#262626',
-          surface0 = '#404040',
-          surface1 = '#525252',
+          base = '#1c1917',
+          mantle = '#292524',
+          surface0 = '#44403c',
+          surface1 = '#57534e',
         },
         integrations = {},
       },
@@ -1127,7 +1130,7 @@ require('lazy').setup({
       event = 'VeryLazy',
       config = function()
         -- Read the API key from the .env file
-        local env_path = os.getenv 'HOME' .. '/.config/nvim/.env'
+        local env_path = 'C://Users//mohni//AppData//Local//nvim//.env'
         require('chatgpt').setup {
           api_key_cmd = 'cat ' .. env_path,
         }
