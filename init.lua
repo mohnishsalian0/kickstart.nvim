@@ -197,6 +197,10 @@ vim.keymap.set('v', '<C-j>', '10j', { desc = 'Move 10 lines down in visual mode'
 vim.keymap.set('n', '<C-k>', '10k', { desc = 'Move 10 lines up' })
 vim.keymap.set('v', '<C-k>', '10k', { desc = 'Move 10 lines up in visual mode' })
 
+-- Use '-' to open file explorer in nvim
+vim.keymap.set('n', '-', '<CMD>Oil<CR>', { desc = 'Open parent directory' })
+vim.keymap.set('v', '-', '<CMD>Oil<CR>', { desc = 'Open parent directory' })
+
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
 
@@ -295,7 +299,7 @@ require('lazy').setup({
         ['<leader>w'] = { name = '[W]orkspace', _ = 'which_key_ignore' },
         ['<leader>t'] = { name = '[T]oggle', _ = 'which_key_ignore' },
         ['<leader>h'] = { name = 'Git [H]unk', _ = 'which_key_ignore' },
-        m = {
+        ['<leader>a'] = {
           name = 'ChatGPT',
           c = { '<cmd>ChatGPT<CR>', 'ChatGPT' },
           e = { '<cmd>ChatGPTEditWithInstruction<CR>', 'Edit with instruction', mode = { 'n', 'v' } },
@@ -1059,7 +1063,7 @@ require('lazy').setup({
       ft = { 'rust' },
       opts = {
         server = {
-          on_attach = function(client, bufnr)
+          on_attach = function(_, bufnr)
             -- register which-key mappings
             local wk = require 'which-key'
             wk.register({
@@ -1153,6 +1157,14 @@ require('lazy').setup({
       'windwp/nvim-autopairs',
       event = 'InsertEnter',
       config = true,
+    },
+
+    -- File explorer
+    {
+      'stevearc/oil.nvim',
+      config = function()
+        require('oil').setup()
+      end,
     },
   },
 }, {
