@@ -862,10 +862,10 @@ require('lazy').setup({
       },
       color_overrides = {
         mocha = {
-          base = '#1c1917',
-          mantle = '#292524',
-          surface0 = '#44403c',
-          surface1 = '#57534e',
+          base = '#171717',
+          mantle = '#262626',
+          surface0 = '#404040',
+          surface1 = '#525252',
         },
         integrations = {},
       },
@@ -1134,7 +1134,7 @@ require('lazy').setup({
       event = 'VeryLazy',
       config = function()
         -- Read the API key from the .env file
-        local env_path = 'C://Users//mohni//AppData//Local//nvim//.env'
+        local env_path = os.getenv 'HOME' .. '/.env'
         require('chatgpt').setup {
           api_key_cmd = 'cat ' .. env_path,
         }
