@@ -1135,10 +1135,9 @@ require('lazy').setup({
       config = function()
         -- Read the API key from the .env file
         local path_separator = package.config:sub(1, 1) == '\\' and '\\' or '/'
-        local env_path = os.getenv 'HOME' .. path_separator .. '.env'
+        local env_path = vim.loop.os_homedir() .. path_separator .. '.env'
         require('chatgpt').setup {
           api_key_cmd = 'cat ' .. env_path,
-          -- api_key_cmd = 'cat .env',
         }
       end,
       dependencies = {
