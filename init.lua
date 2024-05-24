@@ -1134,9 +1134,11 @@ require('lazy').setup({
       event = 'VeryLazy',
       config = function()
         -- Read the API key from the .env file
-        local env_path = os.getenv 'HOME' .. '/.env'
+        local path_separator = package.config:sub(1, 1) == '\\' and '\\' or '/'
+        local env_path = os.getenv 'HOME' .. path_separator .. '.env'
         require('chatgpt').setup {
           api_key_cmd = 'cat ' .. env_path,
+          -- api_key_cmd = 'cat .env',
         }
       end,
       dependencies = {
