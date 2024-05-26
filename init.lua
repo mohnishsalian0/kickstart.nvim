@@ -912,9 +912,17 @@ require('lazy').setup({
       local statusline = require 'mini.statusline'
 
       local todo_count = function(word)
-        -- local command = string.format("rg -c '%s' . | awk -F ':' '{sum += $2} END {print sum}' | tr -d '\n'", word)
-        local command = string.format("rg -c '%s' . | grep -o '[0-9]*' | awk '{sum += $1} END {print sum}' | tr -d '\n'", word)
-        return vim.fn.system(command)
+        local command = string.format("rg -c '%s' .", word)
+        local output = vim.fn.systemlist(command)
+        local total_count = 0
+        for _, line in ipairs(output) do
+          print(line)
+          local count = tonumber(string.match(line, ':(%d+)'))
+          if count then
+            total_count = total_count + count
+          end
+        end
+        return total_count
       end
 
       local custom_content_active = function()
@@ -1005,15 +1013,15 @@ require('lazy').setup({
       statusline.section_todo = function()
         local result = ''
         local todo = todo_count 'TODO:'
-        if todo ~= '' then
+        if todo ~= 0 then
           result = '✏️ ' .. todo
         end
         local fixme = todo_count 'FIXME:'
-        if fixme ~= '' then
+        if fixme ~= 0 then
           result = result .. ' ⚒️ ' .. fixme
         end
         local hack = todo_count 'HACK:'
-        if hack ~= '' then
+        if hack ~= 0 then
           result = result .. ' 🩹' .. hack
         end
         return result
