@@ -867,7 +867,7 @@ require('lazy').setup({
           surface0 = '#404040',
           surface1 = '#525252',
           overlay0 = '#737373',
-          text = '#e5e5e5',
+          text = '#d4d4d4',
         },
         integrations = {},
       },
@@ -910,20 +910,6 @@ require('lazy').setup({
       --  You could remove this setup call if you don't like it,
       --  and try some other statusline plugin
       local statusline = require 'mini.statusline'
-
-      local todo_count = function(word)
-        local command = string.format("rg -c '%s' .", word)
-        local output = vim.fn.systemlist(command)
-        local total_count = 0
-        for _, line in ipairs(output) do
-          print(line)
-          local count = tonumber(string.match(line, ':(%d+)'))
-          if count then
-            total_count = total_count + count
-          end
-        end
-        return total_count
-      end
 
       local custom_content_active = function()
         local mode, mode_hl = statusline.section_mode { trunc_width = 120 }
@@ -1009,22 +995,39 @@ require('lazy').setup({
         return '%#StatusLineNC#' .. file_path .. path_separator .. '%#StatusLine#' .. icon .. ' ' .. file_name
       end
 
+      -- Util function to calculate todo, fixme, hack, etc.
+      local todo_count = function(word)
+        local command = string.format("rg -c '%s' .", word)
+        local output = vim.fn.systemlist(command)
+        local total_count = 0
+        for _, line in ipairs(output) do
+          local count = tonumber(string.match(line, ':(%d+)'))
+          if count then
+            total_count = total_count + count
+          end
+        end
+        return total_count
+      end
+
       -- Total count of todo, fixme, hacks, etc across the project
       statusline.section_todo = function()
-        local result = ''
+        local result = {}
         local todo = todo_count 'TODO:'
         if todo ~= 0 then
-          result = '✏️ ' .. todo
+          table.insert(result, '✏️ ' .. todo)
         end
         local fixme = todo_count 'FIXME:'
         if fixme ~= 0 then
-          result = result .. ' ⚒️ ' .. fixme
+          table.insert(result, '⚒️ ' .. fixme)
         end
         local hack = todo_count 'HACK:'
         if hack ~= 0 then
-          result = result .. ' 🩹' .. hack
+          table.insert(result, '🩹' .. hack)
         end
-        return result
+        if not result then
+          return ''
+        end
+        return table.concat(result, ' ') .. ' '
       end
 
       -- Define a custom function to map diagnostic severity levels to icons
