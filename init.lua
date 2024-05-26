@@ -996,11 +996,17 @@ require('lazy').setup({
       ---@diagnostic disable-next-line: duplicate-set-field
       statusline.section_diagnostics = function()
         local diagnostics = vim.diagnostic.get(0)
+        -- local diagnostic_levels = {
+        --   { name = 'ERROR', sign = '%#DiagnosticError#e' },
+        --   { name = 'WARN', sign = '%#DiagnosticWarn#w' },
+        --   { name = 'INFO', sign = '%#DiagnosticInfo#i' },
+        --   { name = 'HINT', sign = '%#DiagnosticHint#h' },
+        -- }
         local diagnostic_levels = {
-          { name = 'ERROR', sign = '%#DiagnosticError#e' },
-          { name = 'WARN', sign = '%#DiagnosticWarn#w' },
-          { name = 'INFO', sign = '%#DiagnosticInfo#i' },
-          { name = 'HINT', sign = '%#DiagnosticHint#h' },
+          { name = 'ERROR', sign = '🔴' },
+          { name = 'WARN', sign = '🟠' },
+          { name = 'INFO', sign = '🔵' },
+          { name = 'HINT', sign = '🟢' },
         }
         local count = {}
         for _, d in ipairs(diagnostics) do
@@ -1011,13 +1017,13 @@ require('lazy').setup({
           local n = count[severity[level.name]] or 0
           -- Add level info only if diagnostic is present
           if n > 0 then
-            table.insert(t, ' ' .. level.sign .. n)
+            table.insert(t, level.sign .. n)
           end
         end
         if #t == 0 then
           return ''
         end
-        return '🛠' .. table.concat(t, '')
+        return table.concat(t, ' ')
       end
 
       -- ... and there is more!
