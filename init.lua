@@ -951,8 +951,9 @@ require('lazy').setup({
       -- Define content for file info
       ---@diagnostic disable-next-line: duplicate-set-field
       statusline.section_fileinfo = function(args)
-        local fileName = vim.fn.expand '%:t'
-        local filePath = vim.fn.expand '%:p:h'
+        local file_name = vim.fn.expand '%:t'
+        local file_path = vim.fn.expand '%:p:h'
+        local path_separator = package.config:sub(1, 1) == '\\' and '\\' or '/'
         local filetype = vim.bo.filetype
 
         -- Don't show anything if can't detect file type or not inside a "normal
@@ -973,7 +974,7 @@ require('lazy').setup({
             return ''
           end
 
-          local file_name, file_ext = vim.fn.expand '%:t', vim.fn.expand '%:e'
+          local file_ext = vim.fn.expand '%:e'
           return devicons.get_icon(file_name, file_ext, { default = true })
         end
         local icon = get_filetype_icon()
@@ -988,8 +989,7 @@ require('lazy').setup({
         -- local format = vim.bo.fileformat
         -- local size = H.get_filesize()
 
-        -- return string.format('%#StatusLine# %s %s[%s] %*', filetype, encoding, format)
-        return '%#StatusLineNC#' .. filePath .. '\\%#StatusLine#' .. icon .. ' ' .. fileName
+        return '%#StatusLineNC#' .. file_path .. path_separator .. '%#StatusLine#' .. icon .. ' ' .. file_name
       end
 
       -- Define a custom function to map diagnostic severity levels to icons
