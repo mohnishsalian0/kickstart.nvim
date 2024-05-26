@@ -944,7 +944,8 @@ require('lazy').setup({
       ---@diagnostic disable-next-line: duplicate-set-field
       statusline.section_filename = function()
         local cwd = vim.fn.fnamemodify(vim.fn.getcwd(), ':t')
-        return '🗀 ' .. cwd
+        -- return '🗀 ' .. cwd
+        return ' ' .. cwd
       end
 
       -- Define content for file info
