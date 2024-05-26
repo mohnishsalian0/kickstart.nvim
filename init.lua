@@ -909,8 +909,29 @@ require('lazy').setup({
       --  and try some other statusline plugin
       local statusline = require 'mini.statusline'
 
+      local custom_content_active = function()
+        local mode, mode_hl = statusline.section_mode { trunc_width = 120 }
+        local git = statusline.section_git { trunc_width = 75 }
+        local diagnostics = statusline.section_diagnostics { trunc_width = 75, icon = '🛠' }
+        local filename = statusline.section_filename { trunc_width = 140 }
+        local fileinfo = statusline.section_fileinfo { trunc_width = 120 }
+        local location = statusline.section_location { trunc_width = 75 }
+        local search = statusline.section_searchcount { trunc_width = 75 }
+
+        return statusline.combine_groups {
+          { hl = mode_hl, strings = { mode } },
+          { hl = 'MiniStatuslineDevinfo', strings = { git } },
+          '%<', -- Mark general truncate point
+          { hl = 'MiniStatuslineFilename', strings = { filename } },
+          '%=', -- End left alignment
+          { hl = 'MiniStatuslineFileinfo', strings = { fileinfo } },
+          { hl = 'MiniStatuslineDevinfo', strings = { diagnostics } },
+          { hl = mode_hl, strings = { search, location } },
+        }
+      end
+
       -- set use_icons to true if you have a Nerd Font
-      statusline.setup { use_icons = vim.g.have_nerd_font }
+      statusline.setup { content = { active = custom_content_active }, use_icons = vim.g.have_nerd_font }
 
       -- You can configure sections in the statusline by overriding their
       -- default behavior. For example, here we set the section for
@@ -920,15 +941,65 @@ require('lazy').setup({
         return '%P %2l:%-2v'
       end
 
+      ---@diagnostic disable-next-line: duplicate-set-field
+      statusline.section_filename = function()
+        local cwd = vim.fn.fnamemodify(vim.fn.getcwd(), ':t')
+        return '🗀 ' .. cwd
+      end
+
+      -- Define content for file info
+      ---@diagnostic disable-next-line: duplicate-set-field
+      statusline.section_fileinfo = function(args)
+        local fileName = vim.fn.expand '%:t'
+        local filePath = vim.fn.expand '%:p:h'
+        local filetype = vim.bo.filetype
+
+        -- Don't show anything if can't detect file type or not inside a "normal
+        -- buffer"
+        if (filetype == '') or vim.bo.buftype ~= '' then
+          return ''
+        end
+
+        -- Add filetype icon
+        local get_filetype_icon = function()
+          -- Skip if NerdFonts is disabled
+          if not vim.g.have_nerd_font then
+            return ''
+          end
+          -- Have this `require()` here to not depend on plugin initialization order
+          local has_devicons, devicons = pcall(require, 'nvim-web-devicons')
+          if not has_devicons then
+            return ''
+          end
+
+          local file_name, file_ext = vim.fn.expand '%:t', vim.fn.expand '%:e'
+          return devicons.get_icon(file_name, file_ext, { default = true })
+        end
+        local icon = get_filetype_icon()
+
+        -- Construct output string if truncated
+        if statusline.is_truncated(args.trunc_width) then
+          return ''
+        end
+
+        -- Construct output string with extra file info
+        -- local encoding = vim.bo.fileencoding or vim.bo.encoding
+        -- local format = vim.bo.fileformat
+        -- local size = H.get_filesize()
+
+        -- return string.format('%#StatusLine# %s %s[%s] %*', filetype, encoding, format)
+        return '%#StatusLineNC#' .. filePath .. '\\%#StatusLine#' .. icon .. ' ' .. fileName
+      end
+
       -- Define a custom function to map diagnostic severity levels to icons
       ---@diagnostic disable-next-line: duplicate-set-field
       statusline.section_diagnostics = function()
         local diagnostics = vim.diagnostic.get(0)
         local diagnostic_levels = {
-          { name = 'ERROR', sign = 'x' },
-          { name = 'WARN', sign = '!' },
-          { name = 'INFO', sign = 'i' },
-          { name = 'HINT', sign = '*' },
+          { name = 'ERROR', sign = '%#DiagnosticError#e' },
+          { name = 'WARN', sign = '%#DiagnosticWarn#w' },
+          { name = 'INFO', sign = '%#DiagnosticInfo#i' },
+          { name = 'HINT', sign = '%#DiagnosticHint#h' },
         }
         local count = {}
         for _, d in ipairs(diagnostics) do
@@ -945,7 +1016,7 @@ require('lazy').setup({
         if #t == 0 then
           return ''
         end
-        return '|' .. table.concat(t, '')
+        return '🛠' .. table.concat(t, '')
       end
 
       -- ... and there is more!
