@@ -911,14 +911,20 @@ require('lazy').setup({
       --  and try some other statusline plugin
       local statusline = require 'mini.statusline'
 
+      local todo_count = function(word)
+        local command = string.format("rg -c '%s' . | awk -F ':' '{sum += $2} END {print sum}' | tr -d '\n'", word)
+        return vim.fn.system(command)
+      end
+
       local custom_content_active = function()
         local mode, mode_hl = statusline.section_mode { trunc_width = 120 }
         local git = statusline.section_git { trunc_width = 75 }
-        local diagnostics = statusline.section_diagnostics { trunc_width = 75 }
         local filename = statusline.section_filename { trunc_width = 140 }
         local fileinfo = statusline.section_fileinfo { trunc_width = 120 }
-        local location = statusline.section_location { trunc_width = 75 }
+        local todo = statusline.section_todo()
+        local diagnostics = statusline.section_diagnostics { trunc_width = 75 }
         local search = statusline.section_searchcount { trunc_width = 75 }
+        local location = statusline.section_location { trunc_width = 75 }
 
         return statusline.combine_groups {
           { hl = mode_hl, strings = { mode } },
@@ -927,6 +933,7 @@ require('lazy').setup({
           { hl = 'MiniStatuslineFilename', strings = { filename } },
           '%=', -- End left alignment
           { hl = 'MiniStatuslineFileinfo', strings = { fileinfo } },
+          { hl = 'MiniStatuslineDevinfo', strings = { todo } },
           { hl = 'MiniStatuslineDevinfo', strings = { diagnostics } },
           { hl = mode_hl, strings = { search, location } },
         }
@@ -991,6 +998,24 @@ require('lazy').setup({
         -- local size = H.get_filesize()
 
         return '%#StatusLineNC#' .. file_path .. path_separator .. '%#StatusLine#' .. icon .. ' ' .. file_name
+      end
+
+      -- Total count of todo, fixme, hacks, etc across the project
+      statusline.section_todo = function()
+        local result = ''
+        local todo = todo_count 'TODO:'
+        if todo ~= '' then
+          result = '✏️ ' .. todo
+        end
+        local fixme = todo_count 'FIXME:'
+        if fixme ~= '' then
+          result = result .. ' ⚒️ ' .. fixme
+        end
+        local hack = todo_count 'HACK:'
+        if hack ~= '' then
+          result = result .. ' 🩹' .. hack
+        end
+        return result
       end
 
       -- Define a custom function to map diagnostic severity levels to icons
