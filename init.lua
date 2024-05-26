@@ -843,12 +843,12 @@ require('lazy').setup({
       highlight_overrides = {
         mocha = function(mocha)
           return {
-            Search = { fg = mocha.mantle, bg = mocha.yellow },
             IncSearch = { fg = mocha.mantle, bg = '#ffb38a' },
             Operator = { fg = mocha.text },
             FloatBorder = { bg = mocha.mantle, fg = mocha.mantle },
             Normal = { bg = mocha.mantle },
             NormalFloat = { bg = mocha.surface0 },
+            Search = { fg = mocha.mantle, bg = mocha.yellow },
             TelescopeBorder = { fg = mocha.mantle, bg = mocha.mantle },
             TodoFgTODO = { fg = mocha.teal },
             TodoBgTODO = { fg = mocha.mantle, bg = mocha.teal },
@@ -866,6 +866,8 @@ require('lazy').setup({
           mantle = '#262626',
           surface0 = '#404040',
           surface1 = '#525252',
+          overlay0 = '#737373',
+          text = '#e5e5e5',
         },
         integrations = {},
       },
@@ -912,7 +914,7 @@ require('lazy').setup({
       local custom_content_active = function()
         local mode, mode_hl = statusline.section_mode { trunc_width = 120 }
         local git = statusline.section_git { trunc_width = 75 }
-        local diagnostics = statusline.section_diagnostics { trunc_width = 75, icon = '🛠' }
+        local diagnostics = statusline.section_diagnostics { trunc_width = 75 }
         local filename = statusline.section_filename { trunc_width = 140 }
         local fileinfo = statusline.section_fileinfo { trunc_width = 120 }
         local location = statusline.section_location { trunc_width = 75 }
@@ -944,7 +946,6 @@ require('lazy').setup({
       ---@diagnostic disable-next-line: duplicate-set-field
       statusline.section_filename = function()
         local cwd = vim.fn.fnamemodify(vim.fn.getcwd(), ':t')
-        -- return '🗀 ' .. cwd
         return ' ' .. cwd
       end
 
