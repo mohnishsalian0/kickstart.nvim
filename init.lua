@@ -997,16 +997,9 @@ require('lazy').setup({
 
       -- Util function to calculate todo, fixme, hack, etc.
       local todo_count = function(word)
-        local command = string.format("rg -c '%s' .", word)
+        local command = string.format('rg -wo %s %s', word, vim.fn.expand '%:p')
         local output = vim.fn.systemlist(command)
-        local total_count = 0
-        for _, line in ipairs(output) do
-          local count = tonumber(string.match(line, ':(%d+)'))
-          if count then
-            total_count = total_count + count
-          end
-        end
-        return total_count
+        return tonumber(#output)
       end
 
       -- Total count of todo, fixme, hacks, etc across the project
@@ -1024,22 +1017,13 @@ require('lazy').setup({
         if hack ~= 0 then
           table.insert(result, '🩹' .. hack)
         end
-        if not next(result) then
-          return ''
-        end
-        return table.concat(result, ' ') .. ' '
+        return table.concat(result, ' ')
       end
 
       -- Define a custom function to map diagnostic severity levels to icons
       ---@diagnostic disable-next-line: duplicate-set-field
       statusline.section_diagnostics = function()
         local diagnostics = vim.diagnostic.get(0)
-        -- local diagnostic_levels = {
-        --   { name = 'ERROR', sign = '%#DiagnosticError#e' },
-        --   { name = 'WARN', sign = '%#DiagnosticWarn#w' },
-        --   { name = 'INFO', sign = '%#DiagnosticInfo#i' },
-        --   { name = 'HINT', sign = '%#DiagnosticHint#h' },
-        -- }
         local diagnostic_levels = {
           { name = 'ERROR', sign = '🔴' },
           { name = 'WARN', sign = '🟠' },
