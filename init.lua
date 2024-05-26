@@ -1024,7 +1024,7 @@ require('lazy').setup({
         if hack ~= 0 then
           table.insert(result, '🩹' .. hack)
         end
-        if not result then
+        if not next(result) then
           return ''
         end
         return table.concat(result, ' ') .. ' '
