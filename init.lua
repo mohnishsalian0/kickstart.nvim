@@ -912,7 +912,8 @@ require('lazy').setup({
       local statusline = require 'mini.statusline'
 
       local todo_count = function(word)
-        local command = string.format("rg -c '%s' . | awk -F ':' '{sum += $2} END {print sum}' | tr -d '\n'", word)
+        -- local command = string.format("rg -c '%s' . | awk -F ':' '{sum += $2} END {print sum}' | tr -d '\n'", word)
+        local command = string.format("rg -c '%s' . | grep -o '[0-9]*' | awk '{sum += $1} END {print sum}' | tr -d '\n'", word)
         return vim.fn.system(command)
       end
 
