@@ -1000,7 +1000,7 @@ require('lazy').setup({
         group = vim.api.nvim_create_augroup('kickstart-todo-count', { clear = true }),
         callback = function()
           local words = { 'TODO:', 'FIXME:', 'HACK:' }
-          local icons = { ' ', ' ', '󰶯 ' }
+          local icons = { 'T', 'F', 'H' }
           local wordstring = table.concat(words, '|')
           local command = { 'rg', '-wo', wordstring, vim.fn.expand '%:p' }
           -- Define a function to handle the asynchronous job result
@@ -1015,7 +1015,7 @@ require('lazy').setup({
                 table.insert(result, icons[i] .. tostring(count[w]))
               end
             end
-            vim.g.todo_count = table.concat(result, ' ')
+            vim.g.todo_count = '📝(' .. table.concat(result, ',') .. ')'
           end
           -- Run the ripgrep command asynchronously
           vim.fn.jobstart(command, {
