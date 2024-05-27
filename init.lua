@@ -995,29 +995,42 @@ require('lazy').setup({
         return '%#StatusLineNC#' .. file_path .. path_separator .. '%#StatusLine#' .. icon .. ' ' .. file_name
       end
 
-      -- Util function to calculate todo, fixme, hack, etc.
-      local todo_count = function(word)
-        local command = string.format('rg -wo %s %s', word, vim.fn.expand '%:p')
-        local output = vim.fn.systemlist(command)
-        return tonumber(#output)
-      end
+      vim.api.nvim_create_autocmd({ 'BufAdd', 'BufWritePost' }, {
+        desc = 'Calculate todo count and store in global variable',
+        group = vim.api.nvim_create_augroup('kickstart-todo-count', { clear = true }),
+        callback = function()
+          local words = { 'TODO:', 'FIXME:', 'HACK:' }
+          local icons = { ' ', ' ', '󰶯 ' }
+          local wordstring = table.concat(words, '|')
+          local command = { 'rg', '-wo', wordstring, vim.fn.expand '%:p' }
+          -- Define a function to handle the asynchronous job result
+          local function handle_result(_, data)
+            local count = {}
+            for _, v in pairs(data) do
+              count[v] = (count[v] or 0) + 1
+            end
+            local result = {}
+            for i, w in ipairs(words) do
+              if count[w] and count[w] ~= 0 then
+                table.insert(result, icons[i] .. tostring(count[w]))
+              end
+            end
+            vim.g.todo_count = table.concat(result, ' ')
+          end
+          -- Run the ripgrep command asynchronously
+          vim.fn.jobstart(command, {
+            on_stdout = handle_result,
+            stdout_buffered = true,
+          })
+        end,
+      })
 
       -- Total count of todo, fixme, hacks, etc across the project
       statusline.section_todo = function()
-        local result = {}
-        local todo = todo_count 'TODO:'
-        if todo ~= 0 then
-          table.insert(result, '✏️ ' .. todo)
+        if vim.g.todo_count then
+          return vim.g.todo_count
         end
-        local fixme = todo_count 'FIXME:'
-        if fixme ~= 0 then
-          table.insert(result, '⚒️ ' .. fixme)
-        end
-        local hack = todo_count 'HACK:'
-        if hack ~= 0 then
-          table.insert(result, '🩹' .. hack)
-        end
-        return table.concat(result, ' ')
+        return ''
       end
 
       -- Define a custom function to map diagnostic severity levels to icons
