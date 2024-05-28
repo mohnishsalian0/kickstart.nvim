@@ -843,6 +843,10 @@ require('lazy').setup({
       highlight_overrides = {
         mocha = function(mocha)
           return {
+            DiagnosticVirtualTextError = { fg = mocha.redNC, bg = mocha.mantle },
+            DiagnosticVirtualTextHint = { fg = mocha.tealNC, bg = mocha.mantle },
+            DiagnosticVirtualTextWarn = { fg = mocha.yellowNC, bg = mocha.mantle },
+            DiagnosticVirtualTextInfo = { fg = mocha.blueNC, bg = mocha.mantle },
             IncSearch = { fg = mocha.mantle, bg = '#ffb38a' },
             Operator = { fg = mocha.text },
             FloatBorder = { bg = mocha.mantle, fg = mocha.mantle },
@@ -851,12 +855,12 @@ require('lazy').setup({
             Search = { fg = mocha.mantle, bg = mocha.yellow },
             StatusLine = { bg = mocha.surface0 },
             TelescopeBorder = { fg = mocha.mantle, bg = mocha.mantle },
-            TodoFgTODO = { fg = mocha.teal },
-            TodoBgTODO = { fg = mocha.mantle, bg = mocha.teal },
-            TodoFgHACK = { fg = mocha.yellow },
-            TodoBgHACK = { fg = mocha.mantle, bg = mocha.yellow },
-            TodoFgFIX = { fg = mocha.red },
-            TodoBgFIX = { fg = mocha.mantle, bg = mocha.red },
+            TodoFgTODO = { fg = mocha.tealNC },
+            TodoBgTODO = { fg = mocha.mantle, bg = mocha.tealNC },
+            TodoFgHACK = { fg = mocha.yellowNC },
+            TodoBgHACK = { fg = mocha.mantle, bg = mocha.yellowNC },
+            TodoFgFIX = { fg = mocha.redNC },
+            TodoBgFIX = { fg = mocha.mantle, bg = mocha.redNC },
             WinSeparator = { fg = mocha.mantle, bg = mocha.mantle },
           }
         end,
@@ -869,6 +873,10 @@ require('lazy').setup({
           surface1 = '#525252',
           overlay0 = '#737373',
           text = '#d4d4d4',
+          redNC = '#a16374',
+          yellowNC = '#a59778',
+          tealNC = '#68978f',
+          blueNC = '#61939c',
         },
         integrations = {},
       },
@@ -996,7 +1004,7 @@ require('lazy').setup({
         return '%#StatusLineNC#' .. file_path .. path_separator .. '%#StatusLine# ' .. icon .. ' ' .. file_name
       end
 
-      vim.api.nvim_create_autocmd({ 'BufAdd', 'BufWritePost' }, {
+      vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWritePost' }, {
         desc = 'Calculate todo count and store in global variable',
         group = vim.api.nvim_create_augroup('kickstart-todo-count', { clear = true }),
         callback = function()
@@ -1006,6 +1014,10 @@ require('lazy').setup({
           local command = { 'rg', '-wo', wordstring, vim.fn.expand '%:p' }
           -- Define a function to handle the asynchronous job result
           local function handle_result(_, data)
+            if #data == 1 then
+              vim.g.todo_count = ''
+              return
+            end
             local count = {}
             for _, v in pairs(data) do
               count[v] = (count[v] or 0) + 1
@@ -1016,7 +1028,7 @@ require('lazy').setup({
                 table.insert(result, icons[i] .. tostring(count[w]))
               end
             end
-            vim.g.todo_count = '🛠️' .. table.concat(result, ',') .. ''
+            vim.g.todo_count = ' ' .. table.concat(result, ',') .. ''
           end
           -- Run the ripgrep command asynchronously
           vim.fn.jobstart(command, {
