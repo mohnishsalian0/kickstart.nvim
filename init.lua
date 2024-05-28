@@ -849,6 +849,7 @@ require('lazy').setup({
             Normal = { bg = mocha.mantle },
             NormalFloat = { bg = mocha.surface0 },
             Search = { fg = mocha.mantle, bg = mocha.yellow },
+            StatusLine = { bg = mocha.surface0 },
             TelescopeBorder = { fg = mocha.mantle, bg = mocha.mantle },
             TodoFgTODO = { fg = mocha.teal },
             TodoBgTODO = { fg = mocha.mantle, bg = mocha.teal },
@@ -927,7 +928,7 @@ require('lazy').setup({
           '%<', -- Mark general truncate point
           { hl = 'MiniStatuslineFilename', strings = { filename } },
           '%=', -- End left alignment
-          { hl = 'MiniStatuslineFileinfo', strings = { fileinfo } },
+          { hl = 'MiniStatuslineFilename', strings = { fileinfo } },
           { hl = 'MiniStatuslineDevinfo', strings = { todo } },
           { hl = 'MiniStatuslineDevinfo', strings = { diagnostics } },
           { hl = mode_hl, strings = { search, location } },
@@ -992,7 +993,7 @@ require('lazy').setup({
         -- local format = vim.bo.fileformat
         -- local size = H.get_filesize()
 
-        return '%#StatusLineNC#' .. file_path .. path_separator .. '%#StatusLine#' .. icon .. ' ' .. file_name
+        return '%#StatusLineNC#' .. file_path .. path_separator .. '%#StatusLine# ' .. icon .. ' ' .. file_name
       end
 
       vim.api.nvim_create_autocmd({ 'BufAdd', 'BufWritePost' }, {
@@ -1015,7 +1016,7 @@ require('lazy').setup({
                 table.insert(result, icons[i] .. tostring(count[w]))
               end
             end
-            vim.g.todo_count = '📝(' .. table.concat(result, ',') .. ')'
+            vim.g.todo_count = '🛠️' .. table.concat(result, ',') .. ''
           end
           -- Run the ripgrep command asynchronously
           vim.fn.jobstart(command, {
