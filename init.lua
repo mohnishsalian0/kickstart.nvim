@@ -872,7 +872,7 @@ require('lazy').setup({
           surface0 = '#404040',
           surface1 = '#525252',
           overlay0 = '#737373',
-          text = '#d4d4d4',
+          text = '#e5e5e5',
           redNC = '#a16374',
           yellowNC = '#a59778',
           tealNC = '#68978f',
