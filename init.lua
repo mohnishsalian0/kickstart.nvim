@@ -197,11 +197,11 @@ vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' }
 vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
 vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
 -- vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
-vim.keymap.set('n', '<C-j>', '10j', { desc = 'Move 10 lines down' })
-vim.keymap.set('v', '<C-j>', '10j', { desc = 'Move 10 lines down in visual mode' })
+vim.keymap.set('n', '<C-j>', '8j', { desc = 'Move 10 lines down' })
+vim.keymap.set('v', '<C-j>', '8j', { desc = 'Move 10 lines down in visual mode' })
 -- vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
-vim.keymap.set('n', '<C-k>', '10k', { desc = 'Move 10 lines up' })
-vim.keymap.set('v', '<C-k>', '10k', { desc = 'Move 10 lines up in visual mode' })
+vim.keymap.set('n', '<C-k>', '8k', { desc = 'Move 10 lines up' })
+vim.keymap.set('v', '<C-k>', '8k', { desc = 'Move 10 lines up in visual mode' })
 
 -- Use '-' to open file explorer in nvim
 vim.keymap.set('n', '-', '<CMD>Oil<CR>', { desc = 'Open parent directory' })
@@ -209,6 +209,20 @@ vim.keymap.set('v', '-', '<CMD>Oil<CR>', { desc = 'Open parent directory' })
 
 -- Copy replace 'x' char to unused register
 vim.keymap.set('n', 'x', '"_x')
+
+-- Map the 'c' command to store changes in the "_c register
+vim.api.nvim_set_keymap('n', 'c', '"_c', { noremap = true })
+
+-- Save on Ctrl + S
+vim.keymap.set('n', '<C-s>', ':w<CR>', { desc = 'Save file' })
+
+-- Copy to clipboard
+vim.api.nvim_set_keymap('n', '<C-c>', '"+y', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('v', '<C-c>', '"+y', { noremap = true, silent = true })
+
+-- Paste from clipboard
+vim.api.nvim_set_keymap('n', '<C-v>', '"+p', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('v', '<C-v>', '"+p', { noremap = true, silent = true })
 
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
@@ -662,12 +676,12 @@ require('lazy').setup({
             },
           },
         },
-        tailwindcss = {
-          root_dir = function(...)
-            return require('lspconfig.util').root_pattern '.git'(...)
-          end,
-          filetypes = { 'html', 'css', 'javascript', 'typescript', 'typescriptreact', 'rust' },
-        },
+        -- tailwindcss = {
+        --   root_dir = function(...)
+        --     return require('lspconfig.util').root_pattern '.git'(...)
+        --   end,
+        --   filetypes = { 'html', 'css', 'javascript', 'typescript', 'typescriptreact', 'rust' },
+        -- },
         html = {},
         cssls = {},
 
@@ -738,7 +752,7 @@ require('lazy').setup({
         -- Disable "format_on_save lsp_fallback" for languages that don't
         -- have a well standardized coding style. You can add additional
         -- languages here or re-enable it for the disabled ones.
-        local disable_filetypes = { c = true, cpp = true, javascript = true }
+        local disable_filetypes = { c = true, cpp = true }
         return {
           timeout_ms = 500,
           lsp_fallback = not disable_filetypes[vim.bo[bufnr].filetype],
@@ -751,7 +765,7 @@ require('lazy').setup({
         --
         -- You can use a sub-list to tell conform to run *until* a formatter
         -- is found.
-        -- javascript = { { "prettierd", "prettier" } },
+        javascript = { { 'prettierd', 'prettier' } },
       },
     },
   },
@@ -906,7 +920,7 @@ require('lazy').setup({
             TodoBgHACK = { fg = mocha.mantle, bg = mocha.yellowNC },
             TodoFgFIX = { fg = mocha.redNC },
             TodoBgFIX = { fg = mocha.mantle, bg = mocha.redNC },
-            WinSeparator = { fg = mocha.mantle, bg = mocha.mantle },
+            WinSeparator = { fg = mocha.base, bg = mocha.base },
           }
         end,
       },
@@ -1036,15 +1050,15 @@ require('lazy').setup({
         end
         local icon = get_filetype_icon()
 
-        -- Construct output string if truncated
+        -- Return only file icon & name if truncated
         if statusline.is_truncated(args.trunc_width) then
-          return ''
+          return '%#StatusLine# ' .. icon .. ' ' .. file_name
         end
 
         -- Construct output string with extra file info
         -- local encoding = vim.bo.fileencoding or vim.bo.encoding
         -- local format = vim.bo.fileformat
-        -- local size = H.get_filesize()
+        -- local size = vim.bo.get_filesize()
 
         return '%#StatusLineNC#' .. file_path .. path_separator .. '%#StatusLine# ' .. icon .. ' ' .. file_name
       end
@@ -1251,7 +1265,8 @@ require('lazy').setup({
       optional = true,
       opts = function(_, opts)
         opts.ensure_installed = opts.ensure_installed or {}
-        vim.list_extend(opts.ensure_installed, { 'codelldb', 'tailwindcss-language-server', 'typescript-language-server', 'css-lsp' })
+        vim.list_extend(opts.ensure_installed, { 'codelldb', 'typescript-language-server', 'css-lsp' })
+        -- vim.list_extend(opts.ensure_installed, { 'codelldb', 'tailwindcss-language-server', 'typescript-language-server', 'css-lsp' })
       end,
     },
 
