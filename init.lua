@@ -225,6 +225,9 @@ vim.api.nvim_set_keymap('v', '<C-c>', '"+y', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<C-v>', '"+p', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('v', '<C-v>', '"+p', { noremap = true, silent = true })
 
+-- Remap '+' to toggle all folds under cursor in normal mode
+vim.api.nvim_set_keymap('n', '+', 'zA', { noremap = true, silent = true })
+
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
 
@@ -236,6 +239,18 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
   callback = function()
     vim.highlight.on_yank()
+  end,
+})
+
+-- Fold based on expression or syntax
+vim.api.nvim_create_autocmd({ 'FileType' }, {
+  callback = function()
+    if require('nvim-treesitter.parsers').has_parser() then
+      vim.opt.foldmethod = 'expr'
+      vim.opt.foldexpr = 'nvim_treesitter#foldexpr()'
+    else
+      vim.opt.foldmethod = 'syntax'
+    end
   end,
 })
 
@@ -910,10 +925,13 @@ require('lazy').setup({
             IncSearch = { fg = mocha.mantle, bg = '#ffb38a' },
             Operator = { fg = mocha.text },
             FloatBorder = { bg = mocha.mantle, fg = mocha.mantle },
+            Folded = { bg = mocha.surface0, fg = mocha.flamingo },
             Normal = { bg = mocha.mantle },
             NormalFloat = { bg = mocha.surface0 },
             Search = { fg = mocha.mantle, bg = mocha.yellow },
             StatusLine = { bg = mocha.surface0 },
+            StatusLineNC = { bg = 'none' },
+            TelescopeNormal = { bg = mocha.mantle },
             TelescopeBorder = { fg = mocha.mantle, bg = mocha.mantle },
             TodoFgTODO = { fg = mocha.tealNC },
             TodoBgTODO = { fg = mocha.mantle, bg = mocha.tealNC },
@@ -928,9 +946,10 @@ require('lazy').setup({
       color_overrides = {
         mocha = {
           base = '#171717',
-          mantle = '#262626',
+          mantle = '#1f1f1f',
+          -- mantle = '#252525',
           surface0 = '#404040',
-          surface1 = '#525252',
+          surface1 = '#5C5C5C',
           overlay0 = '#737373',
           text = '#e5e5e5',
           redNC = '#a16374',
